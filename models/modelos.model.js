@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 
 var modelosSchema = Schema({
     nombreM: String,
-    idMarca: String
+    id_Marca: {type: Schema.Types.ObjectId, ref:"marcas"}
 });
 
 module.exports = mongoose.model('modelos', modelosSchema);

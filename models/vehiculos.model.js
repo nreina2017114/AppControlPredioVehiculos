@@ -13,10 +13,10 @@ var vehiculosSchema = Schema({
     cilindros: String,
     puertas: Number,
     caracteristicas: String,
-    id_vendedor: String,
-    id_admin: {type: Schema.ObjectId, ref:"usuario"},
-    id_tipo_combustible: String,
-    idModelo: String
+    id_vendedor: {type: Schema.Types.ObjectId, ref:"usuario"},
+    id_admin: {type: Schema.Types.ObjectId, ref:"usuario"},
+    id_tipo_combustible: {type: Schema.Types.ObjectId, ref:"tipo_combustible"},
+    id_Modelo: {type: Schema.Types.ObjectId, ref:"modelos"}
 });
 
 module.exports = mongoose.model('vehiculos', vehiculosSchema);

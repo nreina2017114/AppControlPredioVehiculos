@@ -45,6 +45,37 @@ function initAdmin(req, res){
 }
 
 
+function login(req, res) {
+    var params = req.body;
+   
+    Usuario.findOne({ email: params.email }, (err, usuarioEncontrado) => {
+        if (err) return res.status(500).send({ mensaje: 'Error en la peticion' });
+
+        if (usuarioEncontrado) {
+            bcrypt.compare(params.password, usuarioEncontrado.password, (err, passVerificada) => {
+                if (passVerificada) {
+                    if (params.getToken === 'true') {
+                        return res.status(200).send({
+                            token: jwt.createToken(usuarioEncontrado)
+                        })
+                    } else {
+                        console.log({token: jwt.createToken(usuarioEncontrado)})
+                        usuarioEncontrado.password = undefined;
+                        return res.status(200).send({ usuarioEncontrado });
+                    }
+                } else {
+                    return res.status(500).send({ mensaje: 'El usuario no se a podido identificar' });
+                }
+            })
+        } else {
+            return res.status(500).send({ mensaje: 'Error al buscar el usuario' });
+        }
+    })
+}
+
+
+
 module.exports ={
-    initAdmin
+    initAdmin,
+    login
 }
