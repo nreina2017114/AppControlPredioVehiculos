@@ -11,6 +11,8 @@ var mdAuth = require('../middlewares/authenticated');
 var api = express.Router();
 
 api.post('/login', usuarioController.login);
+api.post('/saveUser', usuarioController.saveUser);
+
 
 
 // EXPORTAR

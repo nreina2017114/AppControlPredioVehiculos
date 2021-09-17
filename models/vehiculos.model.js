@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var vehiculosSchema = Schema({
-    imagen: String,
+    image: String,
     año: Date,
     color: String,
     precio: Number,

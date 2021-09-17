@@ -7,6 +7,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 // IMPORTACION DE RUTAS
+var usuarioRoutes = require('./routes/usuario.routes');
+
 
 
 // MIDDLEWARES
@@ -18,6 +20,7 @@ app.use(cors());
 
 
 // APLICACION DE RUTAS  localhost:3000/api/ejemplos
+app.use('/api', usuarioRoutes);
 
 
 // EXPORTAR
