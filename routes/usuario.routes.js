@@ -10,8 +10,11 @@ var mdAuth = require('../middlewares/authenticated');
 // RUTAS
 var api = express.Router();
 
-api.post('/login', usuarioController.login);
 api.post('/saveUser', usuarioController.saveUser);
+api.post('/Login', usuarioController.Login);
+
+
+
 
 
 

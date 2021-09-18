@@ -15,6 +15,8 @@ var api = express.Router();
 
 api.put('/uploadImage/:id', [mdUpload], vehiculosController.uploadImage);
 api.get('/getImage/:fileName', [mdUpload] ,vehiculosController.getImage);
+api.post('/registarVehiculo', mdAuth.ensureAuth, vehiculosController.registarVehiculo);
+
 
 
 

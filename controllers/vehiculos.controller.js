@@ -72,7 +72,52 @@ function getImage(req, res){
 }
 
 
+function registarVehiculo(req, res){
+    var body = req.body;
+    var vehiculo = new Vehiculo();
+
+    if(req.user.rol == "ROL_ADMIN"){
+        if(body.ubicacion){
+            Vehiculo.findOne({ubicacion: body.ubicacion}, (err, ubicacionRepeat)=>{
+                if(err){
+                    res.status(500).send({mensaje:"Error general del servidor 1"});
+                }else if(ubicacionRepeat){
+                    res.status(400).send({mensaje:"Ubicacion ya existente"});
+                }else{
+                    vehiculo.image = body.image;
+                    vehiculo.año = body.año;
+                    vehiculo.color = body.color;
+                    vehiculo.precio = body.precio;
+                    vehiculo.ubicacion = body.ubicacion;
+                    vehiculo.motor = body.motor;
+                    vehiculo.cilindros = body.cilindros;
+                    vehiculo.puertas = body.puertas;
+                    vehiculo.caracteristicas = body.caracteristicas;
+
+                    
+                    vehiculo.save((err, vehiculoSave)=>{
+                        if(err){
+                            return res.status(500).send({mensaje:"Error general del servidor 2"});
+                        }else if(vehiculoSave){
+                            return res.send({Vehiculo_Nuevo: vehiculoSave});
+                        }else{
+                            return res.status(400).send({mensaje:"No se pudo registrar el Vehiculo"});
+                        }
+                    });
+                }
+            });
+        }else{
+            res.status(404).send({mensaje:"Ingrese el vehiculo que decea agregar"});
+        }
+    }else{
+        res.status(404).send({mensaje:"No tiene permisos para esta ruta"});
+    }
+}
+
+
+
 module.exports = {
     uploadImage,
-    getImage
+    getImage,
+    registarVehiculo
 }

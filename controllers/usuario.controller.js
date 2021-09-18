@@ -45,32 +45,39 @@ function initAdmin(req, res){
 }
 
 
-function login(req, res) {
-    var params = req.body;
-   
-    Usuario.findOne({ email: params.email }, (err, usuarioEncontrado) => {
-        if (err) return res.status(500).send({ mensaje: 'Error en la peticion' });
 
-        if (usuarioEncontrado) {
-            bcrypt.compare(params.password, usuarioEncontrado.password, (err, passVerificada) => {
-                if (passVerificada) {
-                    if (params.getToken === 'true') {
-                        return res.status(200).send({
-                            token: jwt.createToken(usuarioEncontrado)
-                        })
-                    } else {
-                        console.log({token: jwt.createToken(usuarioEncontrado)})
-                        usuarioEncontrado.password = undefined;
-                        return res.status(200).send({ usuarioEncontrado });
+function Login(req, res){
+    var params = req.body;
+
+    if(params.usuario && params.password){
+        Usuario.findOne({usuario: params.usuario}, (err, userFind)=>{
+            if(err){
+                return res.status(500).send({message: 'Error general'});
+            }else if(userFind){
+                bcrypt.compare(params.password, userFind.password, (err, checkPassword)=>{
+                    if(err){
+                        return res.status(500).send({message: 'Error general al comparar contraseñas'});
+                    }else if(checkPassword){
+                        if(params.gettoken = 'true'){
+                            res.send({
+                                token: jwt.createToken(userFind),
+                            })
+                        }else{
+                            return res.send({message: 'Usuario logeado'});
+                            
+                            
+                        }
+                    }else{
+                        return res.status(403).send({message: 'Usuario o contraseña incorrectos'});
                     }
-                } else {
-                    return res.status(500).send({ mensaje: 'El usuario no se a podido identificar' });
-                }
-            })
-        } else {
-            return res.status(500).send({ mensaje: 'Error al buscar el usuario' });
-        }
-    })
+                })
+            }else{
+                return res.status(401).send({message: 'Cuenta de usuario no encontrada'});
+            }
+        })
+    }else{
+        return res.status(404).send({message: 'Por favor envía los campos obligatorios'});
+    }
 }
 
 
@@ -120,6 +127,6 @@ function saveUser(req, res){
 
 module.exports ={
     initAdmin,
-    login,
-    saveUser
+    saveUser,
+    Login
 }
