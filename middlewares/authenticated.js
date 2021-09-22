@@ -25,7 +25,7 @@ exports.ensureAuth = (req, res, next) => {
 exports.ensureAuthAdmin = (req, res, next) => {
     var payload = req.user;
 
-    if(payload.role != 'ROL_ADMIN'){
+    if(payload.rol != "ROL_ADMIN"){
         return res.status(404).send({message: 'No se requieren permisos para acceder'})
     }else{
        return next(); 

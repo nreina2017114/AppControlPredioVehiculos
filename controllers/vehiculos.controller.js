@@ -1,10 +1,7 @@
 'use strict'
 
-var User = require('../models/usuario.model');
+var Usuario = require('../models/usuario.model');
 var Vehiculo = require('../models/vehiculos.model');
-var jwt = require('../services/jwt');
-
-
 
 var fs = require('fs');
 var path = require('path');
@@ -12,12 +9,10 @@ var path = require('path');
 
 
 function uploadImage(req, res){
-    var userId = req.params.id;
+    var vehiculoId = req.params.id;
     var fileName = 'Sin imagen';
 
-    if(userId != req.user.sub){
-        res.status(403).send({mensaje: 'No tienes permisos'});
-    }else{
+   
         if(req.files){
             //captura la ruta de la imagen
             var filePath = req.files.image.path;
@@ -34,7 +29,7 @@ function uploadImage(req, res){
                 fileExt == 'jpg' ||
                 fileExt == 'jpeg' ||
                 fileExt == 'gif'){
-                    Vehiculo.findByIdAndUpdate(userId, {image: fileName}, {new:true}, (err, vehiculoUpdated)=>{
+                    Vehiculo.findByIdAndUpdate(vehiculoId, {image: fileName}, {new:true}, (err, vehiculoUpdated)=>{
                         if(err){
                             return res.status(500).send({mensaje: 'Error general'});
                         }else if(vehiculoUpdated){
@@ -56,7 +51,7 @@ function uploadImage(req, res){
             return res.status(404).send({mensaje: 'No has subido una imagen'});
         }
     }
-}
+
 
 function getImage(req, res){
     var fileName = req.params.fileName;
@@ -115,9 +110,122 @@ function registarVehiculo(req, res){
 }
 
 
+// ----------------------------------------------------------------------------------------------------------------
+function getVehicles(req, res){
+    Vehiculo.find().exec((err, vehicles) => {
+        if(err){
+            return res.status(500).send({mensaje: "Error al buscar los vehiculos"})
+        }else if(vehicles){
+            console.log(vehicles)
+            return res.send({mensaje: "vehiculos encontrados correctamente", vehicles})
+        }else{
+            return res.status(204).send({mensaje: "No se encontro ningun Vehiculo"})
+        }
+    });
+}
+
+
+
+// ----------------------------------------------------------------------------------------------------------------
+function getVehicleID(req, res) {
+    var VehiculoId = req.params.vehiculoId;
+ 
+    Vehiculo.findById(VehiculoId, (err, vehiculoEncontrado) => {
+    if(err){
+        return res.status(500).send({ mensaje: 'Error en la peticion del Vehiculo' });
+    }else if(vehiculoEncontrado){
+        console.log(vehiculoEncontrado)
+        return res.status(200).send({mensaje:"El Vehiculo ha sido encontrado exitosamente" ,vehiculoEncontrado });
+    }else{
+        return res.status(500).send({ mensaje: 'Error al obtener el Vehiculo.'});
+       }
+   });
+ }
+    
+
+
+// ----------------------------------------------------------------------------------------------------------------
+function updateVehicle(req, res){
+    var idVehicle = req.params.id;
+    var update = req.body; 
+
+    if(req.user.rol !="ROL_ADMIN"){
+        res.status(403).send({mensaje:"No tienes permisos para esta ruta"});
+    }else{
+        Vehiculo .findOne({ubicacion:update.ubicacion},(err, vehiculoRepeat)=>{
+            if(err){
+                res.status(500).send({mensaje:"Error general en el servidor ",err});
+            }else if(vehiculoRepeat){
+                res.status(403).send({mensaje:"No puede actualizar su ubicacion porque no puede ser la misma"});
+            }else{
+                Vehiculo.findByIdAndUpdate(idVehicle, update, {new:true},(err,updateVehiculo) =>{
+                    if(err){
+                        res.status(500).send({mensaje:"Error en el servidor ", err});
+                    }else if(updateVehiculo){
+                        res.send({Vehiculo_Actualizado: updateVehiculo});
+                    }else{
+                        res.status(404).send({mensaje:"El Vehiculo que quiere actualizar no existe"});
+                    }
+                });
+            }
+        });
+    }
+}
+
+
+
+// ---------------------------------------------------------------------------------------------------------------
+function DeleteVehicle(req, res){
+    var idVehicle = req.params.id;
+
+    if(idVehicle != req.user.sub){
+        res.status(403).send({message:"Error de permisos para esta ruta"});
+        console.log(req.user.sub)
+    }else{
+        Vehiculo.findByIdAndRemove(idVehicle,(err,deleted)=>{
+            if(err){
+                res.status(500).send({message:"Error general del servidor ", err});
+            }else if(deleted){
+                res.send({message: "Vehiculo Eliminado Correctamente",deleted});
+            }else{
+                res.status(404).send({message: "No ha indicado el vehiculo que quiere eliminar"});
+            }
+        });
+    }
+    
+}
+
+
+
+// ----------------------------------------------------------------------------------------------------------------
+function search(req, res){
+    var params = req.body;
+
+    if(params.search){
+        Usuario.find({$or:[{precio: params.search},
+                {año: params.search}]}, (err, resultsSearch)=>{
+                            if(err){
+                                return res.status(500).send({mensaje: 'Error general'})
+                            }else if(resultsSearch){
+                                return res.send({resultsSearch})
+                            }else{
+                                return res.status(404).send({mensaje: 'No hay registros para mostrar'})
+                            }
+                        })
+         }else{
+        return res.status(403).send({mensaje: 'Ingresa algún dato en el campo de búsqueda'})
+    }
+}
+
+
 
 module.exports = {
     uploadImage,
     getImage,
-    registarVehiculo
+    registarVehiculo,
+    getVehicles,
+    getVehicleID,
+    updateVehicle,
+    DeleteVehicle,
+    search
 }

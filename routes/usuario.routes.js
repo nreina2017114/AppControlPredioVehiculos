@@ -10,12 +10,13 @@ var mdAuth = require('../middlewares/authenticated');
 // RUTAS
 var api = express.Router();
 
-api.post('/saveUser', usuarioController.saveUser);
+api.post('/saveUser', mdAuth.ensureAuth, usuarioController.saveUser);
 api.post('/Login', usuarioController.Login);
-
-
-
-
+api.get('/getUsers', mdAuth.ensureAuth,usuarioController.getUsers);
+api.get('/getUserID', mdAuth.ensureAuth,usuarioController.getUserID);
+api.put('/updateUser', usuarioController.updateUser);
+api.post('/search', mdAuth.ensureAuth,usuarioController.search);
+api.put('/DeleteUser', mdAuth.ensureAuth,usuarioController.DeleteUser);
 
 
 // EXPORTAR
