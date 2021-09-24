@@ -3,11 +3,14 @@ const mongoose =  require("mongoose");
 const app = require("./app");
 var usuario = require('./controllers/usuario.controller');
 var port = 3000;
+const { createRoles } = require("./controllers/roles.controller");
+
 
 mongoose.Promise = global.Promise;
 //mongoose.set('useFindAndModify', false);
 mongoose.connect('mongodb://localhost:27017/DBPredio_Vehiculos', { useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
     usuario.initAdmin();
+    createRoles();
     console.log('Se encuentra conectado a la base de datos');
 
     app.listen(port, function () {

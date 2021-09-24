@@ -3,6 +3,8 @@
 var Usuario = require('../models/usuario.model');
 var bcrypt = require('bcrypt-nodejs');
 var jwt = require('../services/jwt');
+const { getRole } = require("../models/roles.model");
+
 
 var fs = require('fs');
 var path = require('path');
@@ -86,8 +88,10 @@ function Login(req, res){
 
 // ----------------------------------------------------------------------------------------------------------------
 function saveUser(req, res){
-    var user = new User();
+    var user = new Usuario();
     var params = req.body;
+    const userRole = getRole(role);
+
 
     if(params.usuario && params.email && params.password && params.DPI && params.telefono){
         Usuario.findOne({usuario: params.usuario}, (err, userFind)=>{
@@ -106,6 +110,8 @@ function saveUser(req, res){
                         user.email = params.email.toLowerCase();
                         user.telefono = params.telefono;
                         user.DPI = params.DPI;
+                        user.role = userRole,
+
 
                         user.save((err, userSaved)=>{
                             if(err){

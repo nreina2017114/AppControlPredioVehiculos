@@ -5,15 +5,8 @@ var Schema = mongoose.Schema;
 
 var rolesSchema = Schema ({
     nombreRol: String,
-    descripcion: String
-[
-    {
-        id:1,
-        nombreRol: String,
-        descripcion: String
-    }
-]
-
+    descripcion: String,
+    roleKey: Number
 });
 
 module.exports = mongoose.model('roles', rolesSchema);
